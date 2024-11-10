@@ -7,17 +7,21 @@ const Login: React.FC = () => {
   const navigate = useNavigate(); // Hook para la navegación
 
   const handleLogin = () => {
-    // Aquí puedes agregar la lógica para manejar el inicio de sesión
+    // Lógica para verificar el usuario y contraseña
     console.log('Iniciar sesión con RUT:', rut, 'y contraseña:', password);
 
-    // Redirigir al usuario al menú después de iniciar sesión
-    navigate('/menu');
+    // Si el usuario es "admin", redirigimos al menú principal
+    if (rut === 'admin' && password === 'admin') {
+      navigate('/menu');  // Redirige al menú principal
+    } else {
+      navigate('/ListSubjects');  // Redirige al menú del profesor
+    }
   };
 
   return (
     <div style={styles.container}>
       <Link to="/" style={styles.backButton}>Volver</Link>
-      <h1>Iniciar Sesion</h1>
+      <h1>Iniciar Sesión</h1>
       <div style={styles.form}>
         <input
           type="text"

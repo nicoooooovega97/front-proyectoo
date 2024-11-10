@@ -7,9 +7,10 @@ const Menu: React.FC = () => {
       <h1>Menú Principal</h1>
       <p>Bienvenido al menú principal.</p>
       <div style={styles.buttonContainer}>
-        <Link to="/registro-estudiantes" style={styles.button}>Registro de Estudiantes</Link>
-        <Link to="/gestion-asignaturas" style={styles.button}>Gestión de Asignaturas</Link>
-        <Link to="/control-asistencia" style={styles.button}>Control de Asistencia</Link>
+        <Link to="/register" style={styles.button}>Registrar Nuevo Estudiante</Link>
+        <Link to="/registerTeacher" style={styles.button}>Registrar Nuevo Profesor</Link>
+        <Link to="/management" style={styles.button}>Registrar Asignatura</Link>
+        <Link to="/checkAttendance" style={styles.button}>Control de Asistencia</Link>
       </div>
       <Link to="/" style={styles.link}>Volver al Home</Link>
     </div>
