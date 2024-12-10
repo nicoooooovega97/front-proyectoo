@@ -16,7 +16,7 @@ const Register: React.FC = () => {
 
     // Datos del formulario
     const studentData = { nombre, rut, correo };
-
+    console.log("aqui llego")
     try {
       // Enviar los datos al backend
       await createStudent(studentData);

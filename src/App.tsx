@@ -24,7 +24,7 @@ const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
+      
       <Route path="/menu" element={<Menu />} />
       <Route path="/checkAttendance" element={<CheckAttendance />} />
       <Route path="/management" element={<Management />} />
@@ -39,7 +39,7 @@ const App: React.FC = () => {
       <Route path="/StudentMenu" element={<StudentMenu />} /> {/* Nueva ruta para el menú del estudiante */}
       <Route path="/DocenteMenu" element={<DocenteMenu />} /> {/* Nueva ruta para el menú del docente */}
       <Route path="/NoDocenteMenu" element={<NoDocenteMenu />} /> {/* Nueva ruta para el menú de no docente */}
-    </Routes>
+    </Routes>)
   
 }
 

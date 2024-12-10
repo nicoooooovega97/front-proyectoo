@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3002', // Reemplaza con la URL de tu backend
+  baseURL: 'http://localhost:3002/api', // Reemplaza con la URL de tu backend
 });
 
 export const getAttendances = () => {
@@ -18,7 +18,7 @@ export const createSubject = (subjectData: any) => {
 };
 
 export const createStudent = (studentData: any) => {
-  return api.post('/students', studentData);
+  return api.post('/estudiante', studentData);
 };
 
 export const getStudents = () => {
