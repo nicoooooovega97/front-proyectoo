@@ -3,11 +3,12 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:3002/api', // Reemplaza con la URL de tu backend
-});
+}); // arregla los endpoint de cada uno, la url base debe ser la definida por el backend
 
 export const getAttendances = () => {
   return api.get('/attendances');
 };
+
 
 export const createAttendance = (attendanceData: any) => {
   return api.post('/attendances', attendanceData);
