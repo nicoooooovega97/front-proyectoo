@@ -1,34 +1,37 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { createStudent } from '../apiService'; // Asegúrate de tener esta función en tu servicio API
 
 const Register: React.FC = () => {
   // Definimos el estado para cada uno de los campos del formulario
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [motherLastName, setMotherLastName] = useState('');
+  const [nombre, setNombre] = useState('');
   const [rut, setRut] = useState('');
-  const [age, setAge] = useState('');
-  const [course, setCourse] = useState('');
-  const [medicalRecord, setMedicalRecord] = useState('');
+  const [correo, setCorreo] = useState('');
   const [isSuccess, setIsSuccess] = useState(false); // Estado para el mensaje de éxito
 
   const navigate = useNavigate(); // Hook para redirigir al usuario
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Guardar los datos del formulario (puedes agregar lógica para enviar los datos a una API)
-    console.log({
-      firstName, lastName, motherLastName, rut, age, course, medicalRecord
-    });
+    // Datos del formulario
+    const studentData = { nombre, rut, correo };
 
-    // Mostrar mensaje de éxito
-    setIsSuccess(true);
+    try {
+      // Enviar los datos al backend
+      await createStudent(studentData);
+      console.log('Estudiante registrado:', studentData);
 
-    // Redirigir al menú después de 2 segundos
-    setTimeout(() => {
-      navigate('/Menu'); // Redirige al menú usando navigate
-    }, 2000); // Redirige después de 2 segundos
+      // Mostrar mensaje de éxito
+      setIsSuccess(true);
+
+      // Redirigir al menú después de 2 segundos
+      setTimeout(() => {
+        navigate('/Menu'); // Redirige al menú usando navigate
+      }, 2000); // Redirige después de 2 segundos
+    } catch (error) {
+      console.error('Error al registrar el estudiante:', error);
+    }
   };
 
   return (
@@ -43,71 +46,31 @@ const Register: React.FC = () => {
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputGroup}>
           <label>Nombre:</label>
-          <input 
-            type="text" 
-            value={firstName} 
-            onChange={(e) => setFirstName(e.target.value)} 
-            style={styles.input} 
-          />
-        </div>
-        
-        <div style={styles.inputGroup}>
-          <label>Apellido Paterno:</label>
-          <input 
-            type="text" 
-            value={lastName} 
-            onChange={(e) => setLastName(e.target.value)} 
-            style={styles.input} 
-          />
-        </div>
-
-        <div style={styles.inputGroup}>
-          <label>Apellido Materno:</label>
-          <input 
-            type="text" 
-            value={motherLastName} 
-            onChange={(e) => setMotherLastName(e.target.value)} 
-            style={styles.input} 
+          <input
+            type="text"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            style={styles.input}
           />
         </div>
 
         <div style={styles.inputGroup}>
           <label>RUT:</label>
-          <input 
-            type="text" 
-            value={rut} 
-            onChange={(e) => setRut(e.target.value)} 
-            style={styles.input} 
+          <input
+            type="text"
+            value={rut}
+            onChange={(e) => setRut(e.target.value)}
+            style={styles.input}
           />
         </div>
 
         <div style={styles.inputGroup}>
-          <label>Edad:</label>
-          <input 
-            type="number" 
-            value={age} 
-            onChange={(e) => setAge(e.target.value)} 
-            style={styles.input} 
-          />
-        </div>
-
-        <div style={styles.inputGroup}>
-          <label>Curso:</label>
-          <input 
-            type="text" 
-            value={course} 
-            onChange={(e) => setCourse(e.target.value)} 
-            style={styles.input} 
-          />
-        </div>
-
-        <div style={styles.inputGroup}>
-          <label>Registro Médico:</label>
-          <input 
-            type="text" 
-            value={medicalRecord} 
-            onChange={(e) => setMedicalRecord(e.target.value)} 
-            style={styles.input} 
+          <label>Correo (opcional):</label>
+          <input
+            type="email"
+            value={correo}
+            onChange={(e) => setCorreo(e.target.value)}
+            style={styles.input}
           />
         </div>
 

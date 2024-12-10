@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getSubjects } from '../apiService'; // Asegúrate de tener esta función en tu servicio API
 
 const ListSubjects: React.FC = () => {
-  // Lista de asignaturas del profesor
-  const subjects = [
-    { name: 'Matemáticas', code: 'MAT101' },
-    { name: 'Lenguaje', code: 'LEN102' },
-    { name: 'Historia', code: 'HIS103' },
-    { name: 'Ciencias', code: 'CIE104' },
-  ];
+  const [subjects, setSubjects] = useState<{ name: string; code: string }[]>([]);
+
+  useEffect(() => {
+    // Obtener la lista de asignaturas desde el backend
+    const fetchSubjects = async () => {
+      try {
+        const response = await getSubjects();
+        setSubjects(response.data);
+      } catch (error) {
+        console.error('Error al obtener las asignaturas:', error);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
 
   return (
     <div style={styles.container}>

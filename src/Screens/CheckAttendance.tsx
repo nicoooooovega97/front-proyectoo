@@ -1,29 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getAttendances, createAttendance } from '../apiService'; // Asegúrate de tener estas funciones en tu servicio API
+
+interface Student {
+  id: number;
+  name: string;
+  attendance: number;
+}
 
 const CheckAttendance: React.FC = () => {
-  const [course, setCourse] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [students, setStudents] = useState<Student[]>([]);
   const studentsPerPage = 5; // Número de estudiantes por página
-  
-  const students = [
-    { name: 'Juan Pérez', rut: '12345678-9', course: '1° medio', attendance: 75 },
-    { name: 'Ana González', rut: '98765432-1', course: '3° basico', attendance: 85 },
-    { name: 'Pedro Veliz', rut: '32430543-3', course: '3° basico', attendance: 90 },
-    { name: 'Estaban Vega', rut: '65321453-4', course: '3° basico', attendance: 99 },
-    { name: 'Maria Araya', rut: '2254754-5', course: '2° basico', attendance: 100 },
-    { name: 'Jose Lopez', rut: '3454653-6', course: '1° medio', attendance: 88 },
-    { name: 'Francisca González', rut: '23653452-1', course: '1° basico', attendance: 77 },
-    { name: 'Diego Barraza', rut: '65493123-5', course: '1° basico', attendance: 89 },
-    { name: 'Fernando Rojas', rut: '19324352-1', course: '5° basico', attendance: 100 },
-    { name: 'Juan Araya', rut: '20435345-2', course: '5° basico', attendance: 80 },
-    // Agrega más estudiantes aquí
-  ];
+
+  useEffect(() => {
+    // Obtener datos de asistencia desde el backend
+    const fetchAttendances = async () => {
+      try {
+        const response = await getAttendances();
+        setStudents(response.data);
+      } catch (error) {
+        console.error('Error al obtener las asistencias:', error);
+      }
+    };
+
+    fetchAttendances();
+  }, []);
 
   const filteredStudents = students.filter((student) =>
-    (course === '' || student.course === course) &&
-    (student.name.toLowerCase().includes(searchTerm.toLowerCase()) || student.rut.includes(searchTerm))
+    student.name.toLowerCase().includes(searchTerm.toLowerCase()) || student.id.toString().includes(searchTerm)
   );
 
   // Lógica de paginación
@@ -41,6 +47,21 @@ const CheckAttendance: React.FC = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
+  const handleAttendanceChange = async (studentId: number, presente: boolean) => {
+    const attendanceData = {
+      fecha: new Date().toISOString(),
+      presente,
+      estudianteId: studentId,
+    };
+
+    try {
+      await createAttendance(attendanceData);
+      console.log('Asistencia registrada:', attendanceData);
+    } catch (error) {
+      console.error('Error al registrar la asistencia:', error);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <Link to="/Menu" style={styles.backButton}>Volver</Link>
@@ -49,25 +70,9 @@ const CheckAttendance: React.FC = () => {
 
       {/* Filtros debajo del título */}
       <div style={styles.filters}>
-        <select value={course} onChange={(e) => setCourse(e.target.value)} style={styles.select}>
-          <option value="">Todos los cursos</option>
-          <option value="1° basico">1° basico</option>
-          <option value="2° basico">2° basico</option>
-          <option value="3° basico">3° basico</option>
-          <option value="4° basico">4° basico</option>
-          <option value="5° basico">5° basico</option>
-          <option value="6° basico">6° basico</option>
-          <option value="7° basico">7° basico</option>
-          <option value="8° basico">8° basico</option>
-          <option value="1° medio">1° medio</option>
-          <option value="2° medio">2° medio</option>
-          <option value="3° medio">3° medio</option>
-          <option value="4° medio">4° medio</option>
-        </select>
-
         <input
           type="text"
-          placeholder="Buscar por nombre o RUT"
+          placeholder="Buscar por nombre o ID"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={styles.input}
@@ -80,14 +85,15 @@ const CheckAttendance: React.FC = () => {
           currentStudents.map((student, index) => (
             <div key={index} style={styles.studentCard}>
               <p><strong>{student.name}</strong></p>
-              <p>RUT: {student.rut}</p>
-              <p>Curso: {student.course}</p>
+              <p>ID: {student.id}</p>
               
               {/* Barra de progreso de asistencia */}
               <div style={styles.progressContainer}>
                 <div style={{ ...styles.progressBar, width: `${student.attendance}%` }}></div>
               </div>
               <p>{student.attendance}% asistencia</p>
+              <button onClick={() => handleAttendanceChange(student.id, true)}>Presente</button>
+              <button onClick={() => handleAttendanceChange(student.id, false)}>Ausente</button>
             </div>
           ))
         ) : (
@@ -135,11 +141,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '5px',
     flexDirection: 'column',
     alignItems: 'center',
-  },
-  select: {
-    padding: '8px',
-    borderRadius: '5px',
-    border: '1px solid #ccc',
   },
   input: {
     padding: '8px',

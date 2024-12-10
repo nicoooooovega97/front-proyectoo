@@ -1,25 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getStudents, createNota } from '../apiService'; // Asegúrate de tener estas funciones en tu servicio API
 
 const GradeInput: React.FC = () => {
-  // Lista de estudiantes con una nota inicial (solo una por estudiante en este ejemplo)
-  const students = [
-    { firstName: 'Juan', lastName: 'Pérez', rut: '12345678-9' },
-    { firstName: 'Ana', lastName: 'Gómez', rut: '98765432-1' },
-    { firstName: 'Luis', lastName: 'Martínez', rut: '19283746-5' },
-    { firstName: 'Marta', lastName: 'Fernández', rut: '56748392-7' },
-  ];
-
+  // Estado para almacenar la lista de estudiantes
+  const [students, setStudents] = useState<{ firstName: string; lastName: string; rut: string; id: number }[]>([]);
+  
   // Estado para almacenar las notas de los estudiantes
-  const [grades, setGrades] = useState<{ [key: string]: number[] }>({
-    '12345678-9': [],
-    '98765432-1': [],
-    '19283746-5': [],
-    '56748392-7': [],
-  });
-
+  const [grades, setGrades] = useState<{ [key: string]: number[] }>({});
+  
   // Estado para almacenar las asignaturas
   const [subjects, setSubjects] = useState<string[]>([]);
+
+  // Obtener la lista de estudiantes desde el backend cuando el componente se monta
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await getStudents();
+        setStudents(response.data);
+        // Inicializar el estado de las notas para cada estudiante
+        const initialGrades: { [key: string]: number[] } = {};
+        response.data.forEach((student: { rut: string }) => {
+          initialGrades[student.rut] = [];
+        });
+        setGrades(initialGrades);
+      } catch (error) {
+        console.error('Error al obtener la lista de estudiantes:', error);
+      }
+    };
+
+    fetchStudents();
+  }, []);
 
   // Función para manejar el cambio de nota en cada celda de la tabla
   const handleGradeChange = (e: React.ChangeEvent<HTMLInputElement>, studentRut: string, index: number) => {
@@ -49,6 +60,27 @@ const GradeInput: React.FC = () => {
       }
       return newGrades;
     });
+  };
+
+  // Función para guardar las notas en el backend
+  const handleSaveChanges = async () => {
+    try {
+      for (const student of students) {
+        const studentGrades = grades[student.rut];
+        for (const [index, grade] of studentGrades.entries()) {
+          const notaData = {
+            valor: grade,
+            descripcion: subjects[index],
+            estudianteId: student.id,
+            docenteId: 1, // Reemplaza con el ID del docente correspondiente
+          };
+          await createNota(notaData);
+        }
+      }
+      console.log('Notas guardadas con éxito');
+    } catch (error) {
+      console.error('Error al guardar las notas:', error);
+    }
   };
 
   return (
@@ -93,7 +125,7 @@ const GradeInput: React.FC = () => {
       </table>
 
       {/* Botón para guardar los cambios */}
-      <button style={styles.finishButton}>Guardar Cambios</button>
+      <button onClick={handleSaveChanges} style={styles.finishButton}>Guardar Cambios</button>
     </div>
   );
 };
